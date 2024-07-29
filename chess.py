@@ -1,36 +1,67 @@
 class Figure:
-    def __init__(self, color, position):
+    def __init__(self, color: str, position: tuple[int, int]):
+        """
+        Initializes a figure with a color and position.
+
+        :param color: Color of the figure ('white' or 'black').
+        :param position: Position of the figure on the board as a tuple (column, row).
+        """
         self.color = color
         self.position = position
 
-    def change_color(self):
+    def change_color(self) -> None:
+        """
+        Changes the color of the figure to the opposite color.
+        """
         if self.color == "black":
             self.color = "white"
         else:
             self.color = "black"
 
-    def change_position(self, new_position):
-        if type(new_position) == tuple and len(new_position) == 2:
-            col, row = new_position
-            if 1 <= col <= 8 and 1 <= row <= 8:
-                self.position = new_position
-            else:
-                raise ValueError("Position is out of bounds")
-        else:
-            raise ValueError("Invalid position format")
+    def change_position(self, new_position: tuple[int, int]) -> None:
+        """
+        Changes the position of the figure to the new position if it's valid.
 
-    def _is_valid_position(self, new_position):
-        if type(new_position) == tuple and len(new_position) == 2:
+        :param new_position: New position of the figure as a tuple (column, row).
+        :raises ValueError: If the new position is invalid.
+        """
+        if self._is_valid_position(new_position):
+            self.position = new_position
+        else:
+            raise ValueError("Invalid position format or position is out of bounds")
+
+    def _is_valid_position(self, new_position: tuple[int, int]) -> bool:
+        """
+        Checks if the new position is valid.
+
+        :param new_position: New position as a tuple (column, row).
+        :return: True if the position is valid, otherwise False.
+        """
+        if isinstance(new_position, tuple) and len(new_position) == 2:
             col, row = new_position
             return 1 <= col <= 8 and 1 <= row <= 8
         return False
 
-    def can_move_to(self, new_position):
+    def can_move_to(self, new_position: tuple[int, int]) -> bool:
+        """
+        Determines if the figure can move to the specified position.
+
+        :param new_position: Position as a tuple (column, row).
+        :return: True if the figure can move to the specified position, otherwise False.
+        :raises NotImplementedError: Method should be implemented by subclasses.
+        """
         raise NotImplementedError("This method should be implemented by subclasses")
 
 
 class Pawn(Figure):
-    def can_move_to(self, new_position):
+
+    def can_move_to(self, new_position: tuple[int, int]) -> bool:
+        """
+        Determines if the pawn can move to the specified position.
+
+        :param new_position: Position as a tuple (column, row).
+        :return: True if the pawn can move to the specified position, otherwise False.
+        """
         if not self._is_valid_position(new_position):
             return False
 
@@ -47,7 +78,14 @@ class Pawn(Figure):
 
 
 class Knight(Figure):
-    def can_move_to(self, new_position):
+
+    def can_move_to(self, new_position: tuple[int, int]) -> bool:
+        """
+        Determines if the knight can move to the specified position.
+
+        :param new_position: Position as a tuple (column, row).
+        :return: True if the knight can move to the specified position, otherwise False.
+        """
         if not self._is_valid_position(new_position):
             return False
 
@@ -57,7 +95,13 @@ class Knight(Figure):
 
 
 class Bishop(Figure):
-    def can_move_to(self, new_position):
+    def can_move_to(self, new_position: tuple[int, int]) -> bool:
+        """
+        Determines if the bishop can move to the specified position.
+
+        :param new_position: Position as a tuple (column, row).
+        :return: True if the bishop can move to the specified position, otherwise False.
+        """
         if not self._is_valid_position(new_position):
             return False
 
@@ -67,7 +111,14 @@ class Bishop(Figure):
 
 
 class Rook(Figure):
-    def can_move_to(self, new_position):
+
+    def can_move_to(self, new_position: tuple[int, int]) -> bool:
+        """
+        Determines if the rook can move to the specified position.
+
+        :param new_position: Position as a tuple (column, row).
+        :return: True if the rook can move to the specified position, otherwise False.
+        """
         if not self._is_valid_position(new_position):
             return False
 
@@ -77,7 +128,14 @@ class Rook(Figure):
 
 
 class Queen(Figure):
-    def can_move_to(self, new_position):
+
+    def can_move_to(self, new_position: tuple[int, int]) -> bool:
+        """
+        Determines if the queen can move to the specified position.
+
+        :param new_position: Position as a tuple (column, row).
+        :return: True if the queen can move to the specified position, otherwise False.
+        """
         if not self._is_valid_position(new_position):
             return False
 
@@ -87,7 +145,14 @@ class Queen(Figure):
 
 
 class King(Figure):
-    def can_move_to(self, new_position):
+
+    def can_move_to(self, new_position: tuple[int, int]) -> bool:
+        """
+        Determines if the king can move to the specified position.
+
+        :param new_position: Position as a tuple (column, row).
+        :return: True if the king can move to the specified position, otherwise False.
+        """
         if not self._is_valid_position(new_position):
             return False
 
@@ -96,7 +161,14 @@ class King(Figure):
         return col_diff <= 1 and row_diff <= 1
 
 
-def get_figures_that_can_move(figures, new_position):
+def get_figures_that_can_move(figures: list, new_position: tuple[int, int]) -> list:
+    """
+    Returns a list of figures that can move to the specified position.
+
+    :param figures: List of figures.
+    :param new_position: Position as a tuple (column, row).
+    :return: List of figures that can move to the specified position.
+    """
     return [figure for figure in figures if figure.can_move_to(new_position)]
 
 
