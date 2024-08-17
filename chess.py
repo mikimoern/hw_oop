@@ -25,22 +25,34 @@ class Figure:
         :param new_position: New position of the figure as a tuple (column, row).
         :raises ValueError: If the new position is invalid.
         """
-        if self._is_valid_position(new_position):
-            self.position = new_position
-        else:
+        if not self.is_valid(new_position):
             raise ValueError("Invalid position format or position is out of bounds")
 
-    def _is_valid_position(self, new_position: tuple[int, int]) -> bool:
-        """
-        Checks if the new position is valid.
+        self.position = new_position
 
-        :param new_position: New position as a tuple (column, row).
+    def is_valid(self, position: tuple[int, int]) -> bool:
+        """
+        Checks if the position is valid.
+
+        :param position: Position as a tuple (column, row).
         :return: True if the position is valid, otherwise False.
         """
-        if isinstance(new_position, tuple) and len(new_position) == 2:
-            col, row = new_position
+        if isinstance(position, tuple) and len(position) == 2:
+            col, row = position
             return 1 <= col <= 8 and 1 <= row <= 8
         return False
+
+    def get_move_delta(self, new_position: tuple[int, int]) -> tuple[int, int]:
+        """
+        Calculates the difference in columns and rows between the current position
+        and the new position.
+
+        :param new_position: Position as a tuple (column, row).
+        :return: Tuple of column difference and row difference.
+        """
+        col_diff = abs(new_position[0] - self.position[0])
+        row_diff = abs(new_position[1] - self.position[1])
+        return col_diff, row_diff
 
     def can_move_to(self, new_position: tuple[int, int]) -> bool:
         """
@@ -54,7 +66,6 @@ class Figure:
 
 
 class Pawn(Figure):
-
     def can_move_to(self, new_position: tuple[int, int]) -> bool:
         """
         Determines if the pawn can move to the specified position.
@@ -62,23 +73,22 @@ class Pawn(Figure):
         :param new_position: Position as a tuple (column, row).
         :return: True if the pawn can move to the specified position, otherwise False.
         """
-        if not self._is_valid_position(new_position):
+        if not self.is_valid(new_position):
             return False
 
-        col_diff = new_position[0] - self.position[0]
-        row_diff = new_position[1] - self.position[1]
+        col_diff, row_diff = self.get_move_delta(new_position)
+
         if self.color == "white":
             return col_diff == 0 and (
                 row_diff == 1 or (self.position[1] == 2 and row_diff == 2)
             )
-        else:
-            return col_diff == 0 and (
-                row_diff == -1 or (self.position[1] == 7 and row_diff == -2)
-            )
+
+        return col_diff == 0 and (
+            row_diff == -1 or (self.position[1] == 7 and row_diff == -2)
+        )
 
 
 class Knight(Figure):
-
     def can_move_to(self, new_position: tuple[int, int]) -> bool:
         """
         Determines if the knight can move to the specified position.
@@ -86,12 +96,12 @@ class Knight(Figure):
         :param new_position: Position as a tuple (column, row).
         :return: True if the knight can move to the specified position, otherwise False.
         """
-        if not self._is_valid_position(new_position):
+        col_diff, row_diff = self.get_move_delta(new_position)
+
+        if not ((col_diff == 2 and row_diff == 1) or (col_diff == 1 and row_diff == 2)):
             return False
 
-        col_diff = abs(new_position[0] - self.position[0])
-        row_diff = abs(new_position[1] - self.position[1])
-        return (col_diff == 2 and row_diff == 1) or (col_diff == 1 and row_diff == 2)
+        return self.is_valid(new_position)
 
 
 class Bishop(Figure):
@@ -102,16 +112,14 @@ class Bishop(Figure):
         :param new_position: Position as a tuple (column, row).
         :return: True if the bishop can move to the specified position, otherwise False.
         """
-        if not self._is_valid_position(new_position):
+        if not self.is_valid(new_position):
             return False
 
-        col_diff = abs(new_position[0] - self.position[0])
-        row_diff = abs(new_position[1] - self.position[1])
+        col_diff, row_diff = self.get_move_delta(new_position)
         return col_diff == row_diff
 
 
 class Rook(Figure):
-
     def can_move_to(self, new_position: tuple[int, int]) -> bool:
         """
         Determines if the rook can move to the specified position.
@@ -119,16 +127,14 @@ class Rook(Figure):
         :param new_position: Position as a tuple (column, row).
         :return: True if the rook can move to the specified position, otherwise False.
         """
-        if not self._is_valid_position(new_position):
+        if not self.is_valid(new_position):
             return False
 
-        col_diff = new_position[0] - self.position[0]
-        row_diff = new_position[1] - self.position[1]
+        col_diff, row_diff = self.get_move_delta(new_position)
         return col_diff == 0 or row_diff == 0
 
 
 class Queen(Figure):
-
     def can_move_to(self, new_position: tuple[int, int]) -> bool:
         """
         Determines if the queen can move to the specified position.
@@ -136,16 +142,14 @@ class Queen(Figure):
         :param new_position: Position as a tuple (column, row).
         :return: True if the queen can move to the specified position, otherwise False.
         """
-        if not self._is_valid_position(new_position):
+        if not self.is_valid(new_position):
             return False
 
-        col_diff = abs(new_position[0] - self.position[0])
-        row_diff = abs(new_position[1] - self.position[1])
+        col_diff, row_diff = self.get_move_delta(new_position)
         return col_diff == row_diff or col_diff == 0 or row_diff == 0
 
 
 class King(Figure):
-
     def can_move_to(self, new_position: tuple[int, int]) -> bool:
         """
         Determines if the king can move to the specified position.
@@ -153,11 +157,10 @@ class King(Figure):
         :param new_position: Position as a tuple (column, row).
         :return: True if the king can move to the specified position, otherwise False.
         """
-        if not self._is_valid_position(new_position):
+        if not self.is_valid(new_position):
             return False
 
-        col_diff = abs(new_position[0] - self.position[0])
-        row_diff = abs(new_position[1] - self.position[1])
+        col_diff, row_diff = self.get_move_delta(new_position)
         return col_diff <= 1 and row_diff <= 1
 
 
@@ -172,6 +175,7 @@ def get_figures_that_can_move(figures: list, new_position: tuple[int, int]) -> l
     return [figure for figure in figures if figure.can_move_to(new_position)]
 
 
+# Example usage:
 figures = [
     Pawn("white", (5, 2)),
     Knight("black", (2, 1)),
